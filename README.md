@@ -1,3 +1,4 @@
+![logo](mountain.png)
 # Jabal
 
 Write Python code. Get desktop, mobile, and web games from one code-base.
