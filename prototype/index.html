@@ -14,8 +14,14 @@
         <script type="text/javascript">
             Crafty.init(800, 600);
             Crafty.background("#444");
-            Crafty.e('2D, DOM, Color, Fourway')
-                .attr({x: 32, y: 32, w: 48, h: 48 }).color('red').fourway(20);        
+            
+            Crafty.audio.add("blip", "blip.wav");
+            
+            Crafty.e('2D, DOM, Color, Fourway, Mouse')
+                .attr({x: 32, y: 32, w: 48, h: 48 }).color('red').fourway(20)
+                .bind("Click", function() {
+                    Crafty.audio.play("blip");
+                });     
         </script>
     </body>
 </html>
