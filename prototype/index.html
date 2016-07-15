@@ -1,6 +1,7 @@
 <html>
     <head>
         <script type="text/javascript" src="https://cdn.rawgit.com/brython-dev/brython/3.2.7/www/src/brython_dist.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crafty/0.7.0/crafty-min.js"></script>
     </head>
     <body onload="brython()">
         <script type="text/python">
@@ -8,6 +9,13 @@
             import math
             
             console.log("Hello from Python!")
+        </script>
+        
+        <script type="text/javascript">
+            Crafty.init(800, 600);
+            Crafty.background("#444");
+            Crafty.e('2D, DOM, Color, Fourway')
+                .attr({x: 32, y: 32, w: 48, h: 48 }).color('red').fourway(20);        
         </script>
     </body>
 </html>
