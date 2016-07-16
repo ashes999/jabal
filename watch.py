@@ -1,12 +1,16 @@
-import datetime, os.path, sys, time
+import datetime, os.path, re, sys, time
 
 class AppBuilder:
     
-    CONTENT_PLACEHOLDER = '<jabal-main />'
+    CONTENT_PLACEHOLDER = '<jabal-code />'
     DEFAULT_MAIN_FILE = 'main.py'
     OUTPUT_DIRECTORY = 'bin'
     TEMPLATE_DIRECTORY = 'template'
     MAIN_HTML_FILE = 'index.html'
+    
+    # not guaranteed to be a package name and doesn't include multiple imports on one line
+    IMPORT_REGEX = '(from ([a-z\.]+) import [a-z]+)'
+    IGNORE_IMPORTS = ['browser', 'console', 'document', 'window'] # Brython libraries
         
     def watch(self):
 
@@ -21,13 +25,15 @@ class AppBuilder:
                 last_updated = now
                 
                 with open(watch) as source_file:
-                    data = source_file.read()
+                    main_code = source_file.read()
+                    
+                with_imports = self.inline_imports(main_code)                
                     
                 with open("{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
-                
+                    
                 with open("{0}/{1}".format(AppBuilder.OUTPUT_DIRECTORY, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
-                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, data)
+                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, with_imports)
                     out_file.write(substituted)
                         
             time.sleep(0.5)
@@ -48,4 +54,32 @@ class AppBuilder:
         if not os.path.exists(dir):
             os.makedirs(dir)
                 
+    def inline_imports(self, python_code):
+        # Replace "from a.b import C" with the contents of a/b.py
+        # With our current regex, a.b is not guaranteed to be valid
+        # TODO: make this recursive
+        
+        regex = re.compile(AppBuilder.IMPORT_REGEX, re.IGNORECASE)
+        matches = regex.findall(python_code) # matching strings
+        
+        for match in matches:
+            import_statement = match[0]
+            module_name = match[1]
+            
+            path_name = module_name.replace('.', '/')
+            path_name += ".py" 
+            
+            if AppBuilder.IGNORE_IMPORTS.__contains__(module_name):
+                continue
+            
+            if not os.path.exists(path_name):
+                print "WARNING: imported {0} but {1} doesn't exist".format(module_name, path_name)
+            
+            with open(path_name) as imported_file:
+                imported_code = imported_file.read()
+            
+            python_code = python_code.replace(import_statement, imported_code)
+            
+        return python_code
+            
 AppBuilder().watch()
