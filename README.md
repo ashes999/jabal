@@ -25,4 +25,17 @@ e.on_click(lambda: Jabal.audio.play("blip"))
 
 This creates an `800x600` greyish background with a red square. The red square responds to arrow keys (and WASD). Clicking on it plays `blip.wave` (create one with [BFXR](http://www.bfxr.net/)).
 
-You can write your own code, too 
+You can write your own code, too.
+
+Compile (to Javascript) and run by running `python watch.py`. The resulting Javascript (including assets, etc.) appears in `bin`.
+
+# Importing
+
+To import files, you need a local webserver, because of cross-origin requests (don't work with `file://...`).
+
+Jabal works around this by automatically substituting imports with their modules/classes. For example:
+
+- Create a directory called `utils` with a file called `my_random.py`
+- Add a class or module called `MyRandom` into `my_random.py`
+- Add `from utils.my_random import MyRandom`
+- Inspect the generated `index.html` file in `bin`. It should contain the contents of `my_random.py`.
