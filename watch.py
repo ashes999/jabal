@@ -1,4 +1,4 @@
-import datetime, os.path, re, sys, time
+import datetime, os.path, re, shutil, sys, time
 
 class AppBuilder:
     
@@ -18,8 +18,14 @@ class AppBuilder:
 
         watch_path = self.validate_args()
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
-        output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
+        output_directory = "{0}{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         self.ensure_exists(output_directory)
+        
+        # Copy backend template. Index.html gets overridden, so it's not excluded.
+        relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
+        self.copy_directory_tree(relative_template_directory, output_directory)       
+        self.copy_directory_tree(watch_path, output_directory)
+        
         last_updated = None
         
         while True:
@@ -31,7 +37,7 @@ class AppBuilder:
                 with open(main_file) as source_file:
                     main_code = source_file.read()
                     
-                jabal_module_file = "{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.JABAL_MAIN_PY)
+                jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
                 with open(jabal_module_file) as jabal_module:
                     jabal_code = jabal_module.read()
                     main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
@@ -91,5 +97,18 @@ class AppBuilder:
             python_code = python_code.replace(import_statement, imported_code)
             
         return python_code
+
+    # Copies all the files and folders in "directory" to "destination"
+    def copy_directory_tree(self, directory, destination):
+        for entry in os.listdir(directory):
+            if entry == AppBuilder.OUTPUT_DIRECTORY:
+                continue
+            if os.path.isdir(entry):
+                entrydest = os.path.join(destination, entry)
+                shutil.copytree(entryPath, entrydest)
+            else:
+                entrysrc = os.path.join(directory, entry)
+                shutil.copy(os.path.realpath(entrysrc), destination)
+                
             
 AppBuilder().watch()
