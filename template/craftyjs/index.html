@@ -2,18 +2,7 @@
     <head>
         <script type="text/javascript" src="https://cdn.rawgit.com/brython-dev/brython/3.2.7/www/src/brython_dist.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crafty/0.7.0/crafty-min.js"></script>
-        
-        <script type="text/javascript">
-            // Store properties. Crafty uses Crafty.extend(...) which calls
-            // for key in obj { this[key] = obj[key] }.
-            // As of these versions, Brython doesn't carry those over to the Python,
-            // it only seems to carry over methods. We can easily get around this by
-            // storing those properties separately and assigning them later.
-            window.craftyProperties = {
-                "audio": Crafty.audio,
-                "support": Crafty.support
-            };
-        </script>        
+        <script type="text/javascript" src="jabal.js"></script>
         
     </head>
     <body onload="brython()">

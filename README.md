@@ -12,22 +12,15 @@ Clone this repository somewhere.
 In a separate directory, add the following sample code to `main.py`:
 
 ```python
-from browser import console, window, document
-
 Jabal.init(800, 600)
-Jabal.background("#444")
+Jabal.load_audio(["blip.wav"])
 
-Jabal.audio.load("blip", "blip.wav")
-
-e = Jabal.Entity('2D, DOM, Color, Fourway, Mouse')
+e = Jabal.entity()
 e.size(48, 48).color('red').move(32, 16).move_with_keyboard()
-
-e.on_click(lambda: Jabal.audio.play("blip")) 
+e.on_click(lambda: Jabal.audio.play("blip"))
 ```
 
 This creates an `800x600` greyish background with a red square. The red square responds to arrow keys (and WASD). Clicking on it plays `blip.wave` (create one with [BFXR](http://www.bfxr.net/)).
-
-You can write your own code, too.
 
 Compile (to Javascript) and run by running `python /path/to/jabal/watch.py`. The resulting Javascript (including assets, etc.) appears in `bin`.
 
@@ -39,5 +32,6 @@ Jabal works around this by automatically substituting imports with their modules
 
 - Create a directory called `utils` with a file called `my_random.py`
 - Add a class or module called `MyRandom` into `my_random.py`
-- Add `from utils.my_random import MyRandom`
-- Inspect the generated `index.html` file in `bin`. It should contain the contents of `my_random.py`.
+- Add `from utils.my_random import MyRandom` in `main.py`
+
+Build your game. The generated `index.html` file in `bin` contains the contents of `my_random.py` before the contents of `main.py`.

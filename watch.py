@@ -2,16 +2,17 @@ import datetime, os.path, re, sys, time
 
 class AppBuilder:
     
-    CONTENT_PLACEHOLDER = '<jabal-code />'
-    DEFAULT_MAIN_FILE = 'main.py'
-    OUTPUT_DIRECTORY = 'bin'
-    TEMPLATE_DIRECTORY = 'template'
-    MAIN_HTML_FILE = 'index.html'
-    JABAL_BACKEND = 'craftyjs'
+    CONTENT_PLACEHOLDER = '<jabal-code />' # string in the template HTML to replace with amalgamated code
+    DEFAULT_MAIN_FILE = 'main.py' # entry point file in the user's source code
+    OUTPUT_DIRECTORY = 'bin' # subdirectory in the source directory where we output generated code
+    TEMPLATE_DIRECTORY = 'template' # directory with all our template files
+    MAIN_HTML_FILE = 'index.html' # name of the generated (and template) HTML file
+    JABAL_BACKEND = 'craftyjs' # back-end to use in generation
+    JABAL_MAIN_PY = 'jabal.py' # file containing jabal's python module, to include first
     
     # not guaranteed to be a package name and doesn't include multiple imports on one line
     IMPORT_REGEX = '(from ([a-z\.]+) import [a-z]+)'
-    IGNORE_IMPORTS = ['browser', 'console', 'document', 'window'] # Brython libraries
+    IGNORE_IMPORTS = ['browser', 'console', 'document', 'window'] # Brython/JS interop
         
     def watch(self):
 
@@ -30,13 +31,18 @@ class AppBuilder:
                 with open(main_file) as source_file:
                     main_code = source_file.read()
                     
-                with_imports = self.inline_imports(main_code)                
+                jabal_module_file = "{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.JABAL_MAIN_PY)
+                with open(jabal_module_file) as jabal_module:
+                    jabal_code = jabal_module.read()
+                    main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
+                    
+                main_code = self.inline_imports(main_code)                
                     
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
                     
                 with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
-                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, with_imports)
+                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
                     out_file.write(substituted)
                         
             time.sleep(0.5)
