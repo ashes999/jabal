@@ -15,9 +15,8 @@ In a separate directory, add the following sample code to `main.py`:
 Jabal.init(800, 600)
 Jabal.load_audio(["blip.wav"])
 
-e = Jabal.entity()
-e.size(48, 48).color('red').move(32, 16).move_with_keyboard()
-e.on_click(lambda: Jabal.audio.play("blip"))
+e = Entity().size(48, 48).colour('red')
+e.move(32, 16).move_with_keyboard().on_click(lambda: Jabal.play_audio("blip"))
 ```
 
 This creates an `800x600` greyish background with a red square. The red square responds to arrow keys (and WASD). Clicking on it plays `blip.wave` (create one with [BFXR](http://www.bfxr.net/)).
