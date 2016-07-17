@@ -14,17 +14,19 @@ class AppBuilder:
         
     def watch(self):
 
-        watch = self.validate_args()
-        self.ensure_exists(AppBuilder.OUTPUT_DIRECTORY)
+        watch_path = self.validate_args()
+        main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
+        output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
+        self.ensure_exists(output_directory)
         last_updated = None
         
         while True:
-            now = os.path.getmtime(watch)
+            now = os.path.getmtime(main_file)
             if now != last_updated:
-                print("{0} changed at {1}. Rebuilding.".format(watch, datetime.datetime.now()))
+                print("{0} changed at {1}. Rebuilding.".format(main_file, datetime.datetime.now()))
                 last_updated = now
                 
-                with open(watch) as source_file:
+                with open(main_file) as source_file:
                     main_code = source_file.read()
                     
                 with_imports = self.inline_imports(main_code)                
@@ -32,23 +34,24 @@ class AppBuilder:
                 with open("{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
                     
-                with open("{0}/{1}".format(AppBuilder.OUTPUT_DIRECTORY, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
+                with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
                     substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, with_imports)
                     out_file.write(substituted)
                         
             time.sleep(0.5)
                 
     def validate_args(self):
-        if len(sys.argv) > 2:
-            print("Usage: python main.py <main file to watch>")
+        if len(sys.argv) != 2:
+            print("Usage: python watch.py /path/to/yourgame")
             sys.exit(1)
-        else:    
-            if len(sys.argv) == 2:
-                watch = sys.argv[1]
-            else:
-                watch = AppBuilder.DEFAULT_MAIN_FILE
+        else:
+            watch_path = sys.argv[1]
             
-            return watch
+        main_file = "{0}/{1}".format(sys.argv[1], AppBuilder.DEFAULT_MAIN_FILE)
+        if not os.path.exists(main_file):
+            raise(Exception("Can't find {0}".format(main_file)))
+            
+        return watch_path
     
     def ensure_exists(self, dir):
         if not os.path.exists(dir):

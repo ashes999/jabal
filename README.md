@@ -7,7 +7,9 @@ Jabal leverages Brython to embed itself and run inside a webpage, and wraps and 
 
 # Getting Started
 
-Clone this repository. Then, add the following sample code to `main.py`:
+Clone this repository somewhere.
+
+In a separate directory, add the following sample code to `main.py`:
 
 ```python
 from browser import console, window, document
@@ -27,7 +29,7 @@ This creates an `800x600` greyish background with a red square. The red square r
 
 You can write your own code, too.
 
-Compile (to Javascript) and run by running `python watch.py`. The resulting Javascript (including assets, etc.) appears in `bin`.
+Compile (to Javascript) and run by running `python /path/to/jabal/watch.py`. The resulting Javascript (including assets, etc.) appears in `bin`.
 
 # Importing
 
