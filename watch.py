@@ -7,6 +7,7 @@ class AppBuilder:
     OUTPUT_DIRECTORY = 'bin'
     TEMPLATE_DIRECTORY = 'template'
     MAIN_HTML_FILE = 'index.html'
+    JABAL_BACKEND = 'craftyjs'
     
     # not guaranteed to be a package name and doesn't include multiple imports on one line
     IMPORT_REGEX = '(from ([a-z\.]+) import [a-z]+)'
@@ -31,7 +32,7 @@ class AppBuilder:
                     
                 with_imports = self.inline_imports(main_code)                
                     
-                with open("{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.MAIN_HTML_FILE)) as template_file:
+                with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
                     
                 with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
