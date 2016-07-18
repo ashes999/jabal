@@ -11,7 +11,7 @@ class AppBuilder:
     JABAL_MAIN_PY = 'jabal.py' # file containing jabal's python module, to include first
     
     # not guaranteed to be a package name and doesn't include multiple imports on one line
-    IMPORT_REGEX = '(from ([a-z\.]+) import [a-z]+)'
+    IMPORT_REGEX = '(from ([a-z\._]+) import [a-z]+)'
     IGNORE_IMPORTS = ['browser', 'console', 'document', 'window'] # Brython/JS interop
         
     def watch(self):
@@ -24,7 +24,7 @@ class AppBuilder:
         # Copy backend template. Index.html gets overridden, so it's not excluded.
         relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
         self.copy_directory_tree(relative_template_directory, output_directory)       
-        self.copy_directory_tree(watch_path, output_directory)
+        self.copy_directory_tree(watch_path, output_directory, lambda f: f.upper().endswith('.PY'))
         
         last_updated = None
         
@@ -42,7 +42,7 @@ class AppBuilder:
                     jabal_code = jabal_module.read()
                     main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
                     
-                main_code = self.inline_imports(main_code)                
+                main_code = self.inline_imports(watch_path, main_code)                
                     
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
@@ -70,7 +70,7 @@ class AppBuilder:
         if not os.path.exists(dir):
             os.makedirs(dir)
                 
-    def inline_imports(self, python_code):
+    def inline_imports(self, watch_path, python_code):
         # Replace "from a.b import C" with the contents of a/b.py
         # With our current regex, a.b is not guaranteed to be valid
         # TODO: make this recursive
@@ -82,7 +82,7 @@ class AppBuilder:
             import_statement = match[0]
             module_name = match[1]
             
-            path_name = module_name.replace('.', '/')
+            path_name = "{0}/{1}".format(watch_path, module_name.replace('.', '/'))
             path_name += ".py" 
             
             if AppBuilder.IGNORE_IMPORTS.__contains__(module_name):
@@ -99,16 +99,20 @@ class AppBuilder:
         return python_code
 
     # Copies all the files and folders in "directory" to "destination"
-    def copy_directory_tree(self, directory, destination):
+    # ignore_if_lambda(file_name) returns True if the file should be ignored
+    def copy_directory_tree(self, directory, destination, ignore_if_lambda = None):
         for entry in os.listdir(directory):
             if entry == AppBuilder.OUTPUT_DIRECTORY:
                 continue
-            if os.path.isdir(entry):
-                entrydest = os.path.join(destination, entry)
-                shutil.copytree(entryPath, entrydest)
-            else:
-                entrysrc = os.path.join(directory, entry)
-                shutil.copy(os.path.realpath(entrysrc), destination)
+            if ignore_if_lambda == None or ignore_if_lambda(entry) == True: 
+                entry_src = os.path.join(directory, entry)
+                if os.path.isdir(entry_src):
+                    print "DIR: " + entry_src
+                    entrydest = os.path.join(destination, entry)
+                    shutil.copytree(entry_src, entrydest)
+                else:
+                    print "FILE: " + entry_src
+                    shutil.copy(os.path.realpath(entry_src), destination)
                 
             
 AppBuilder().watch()
