@@ -6,7 +6,7 @@ class AppBuilder:
     CONTENT_PLACEHOLDER = '<jabal-code />' # string in the template HTML to replace with amalgamated code
     DEFAULT_MAIN_FILE = 'main.py' # entry point file in the user's source code
     OUTPUT_DIRECTORY = 'bin' # subdirectory in the source directory where we output generated code
-    TEMPLATE_DIRECTORY = 'template' # directory with all our template files
+    TEMPLATE_DIRECTORY = '../template' # directory with all our template files
     MAIN_HTML_FILE = 'index.html' # name of the generated (and template) HTML file
     JABAL_BACKEND = 'craftyjs' # back-end to use in generation
     JABAL_MAIN_PY = 'jabal.py' # file containing jabal's python module, to include first
