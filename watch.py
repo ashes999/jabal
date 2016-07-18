@@ -23,7 +23,8 @@ class AppBuilder:
         
         # Copy backend template. Index.html gets overridden, so it's not excluded.
         relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
-        self.copy_directory_tree(relative_template_directory, output_directory)       
+        self.copy_directory_tree(relative_template_directory, output_directory)
+        print "From " + watch_path + " to " + output_directory       
         self.copy_directory_tree(watch_path, output_directory, lambda f: f.upper().endswith('.PY'))
         
         last_updated = None
@@ -100,19 +101,18 @@ class AppBuilder:
 
     # Copies all the files and folders in "directory" to "destination"
     # ignore_if_lambda(file_name) returns True if the file should be ignored
-    def copy_directory_tree(self, directory, destination, ignore_if_lambda = None):
+    def copy_directory_tree(self, directory, destination, exclude_if_lambda = None):
         for entry in os.listdir(directory):
             if entry == AppBuilder.OUTPUT_DIRECTORY:
                 continue
-            if ignore_if_lambda == None or ignore_if_lambda(entry) == True: 
+            if exclude_if_lambda == None or exclude_if_lambda(entry) == False: 
                 entry_src = os.path.join(directory, entry)
                 if os.path.isdir(entry_src):
-                    print "DIR: " + entry_src
                     entrydest = os.path.join(destination, entry)
                     shutil.copytree(entry_src, entrydest)
                 else:
-                    print "FILE: " + entry_src
                     shutil.copy(os.path.realpath(entry_src), destination)
+                    print "Copying " + entry_src + " to " + destination
                 
             
 AppBuilder().watch()
