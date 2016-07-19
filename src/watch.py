@@ -17,7 +17,7 @@ class AppBuilder:
         
     def watch(self):
 
-        watch_path = self.validate_args(sys.argv)
+        watch_path = self.validate_args(sys.argv[1:])
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
         output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         
@@ -52,17 +52,16 @@ class AppBuilder:
                 with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
                     substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
                     out_file.write(substituted)
-                        
+
             time.sleep(0.5)
                 
     def validate_args(self, args):
-        if len(args) != 2:
-            print("Usage: python watch.py /path/to/yourgame")
-            sys.exit(1)
+        if len(args) != 1:
+            raise(Exception("Usage: python watch.py /path/to/yourgame"))
         else:
-            watch_path = args[1]
+            watch_path = args[0]
             
-        main_file = "{0}/{1}".format(args[1], AppBuilder.DEFAULT_MAIN_FILE)
+        main_file = "{0}/{1}".format(args[0], AppBuilder.DEFAULT_MAIN_FILE)
         if not os.path.exists(main_file):
             raise(Exception("Can't find {0}".format(main_file)))
             
@@ -96,4 +95,5 @@ class AppBuilder:
             
         return python_code
 
-AppBuilder().watch()
+if __name__ == "__main__":
+    AppBuilder().watch()
