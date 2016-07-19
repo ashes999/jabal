@@ -23,11 +23,13 @@ This creates an `800x600` greyish background with a red square. The red square r
 
 Compile (to Javascript) and run by running `python /path/to/jabal/watch.py`. The resulting Javascript (including assets, etc.) appears in `bin`.
 
-# Importing
+# Create Classes, Not Modules
 
-To import files, you need a local webserver, because of cross-origin requests (don't work with `file://...`).
+Jabal embeds your Python code into a single (minified and obfuscated) script. When you use classes, Jabal embeds and inlines them, along with your `main.py` code, into a single, continuous script. They work.
 
-Jabal works around this by automatically substituting imports with their modules/classes. For example:
+Modules depend fundamentally on being in separate files. They don't work in an embedded environment. 
+
+Sample:
 
 - Create a directory called `utils` with a file called `my_random.py`
 - Add a class or module called `MyRandom` into `my_random.py`

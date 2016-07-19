@@ -62,5 +62,5 @@ class Entity:
         return self
         
     def size(self, width, height):
-        self.entity.attr({ "w": 48, "h": 48 })
+        self.entity.attr({ "w": width, "h": height })
         return self
