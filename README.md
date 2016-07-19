@@ -25,16 +25,42 @@ Compile (to Javascript) and run by running `python /path/to/jabal/watch.py`. The
 
 Run `python -m SimpleHTTPServer` from bin, then open your browser to `localhost:8000`. You should see your game.
 
-# Create Classes, Not Modules
+# Modules, Classes, and Embedding
 
-Jabal embeds your Python code into a single (minified and obfuscated) script. When you use classes, Jabal embeds and inlines them, along with your `main.py` code, into a single, continuous script. They work.
+By default, Jabal uses AJAX requests to fetch files when you `import` them (eg. `import awesome_random` will make a call to `http://localhost/awesome._random.py`). This is why you need a local web server.
 
-Modules aren't embedded, because they have to exist in a file. They're copied to the root directory of your game (where `main.py` lives) and served up as static files by your HTTP server. They're not obfuscated or minified automatically. (If you're not planning to use modules, you don't need an HTTP server to access the generated `index.html` file; you can view it directly in your browser.) 
+Jabal can optionally combine, obfuscate, and embed your Python code inside the HTML instead. You may want to do this if:
 
-Sample:
+- You don't want to use an HTTP server
+- You want your code to be minified/obfuscated
+- You didn't create any modules
 
-- Create a directory called `utils` with a file called `my_random.py`
-- Add a class or module called `MyRandom` into `my_random.py`
-- Add `from utils.my_random import MyRandom` in `main.py`
+To use this mode, pass the `--embed-imports` command-line argument to Jabal. The generated `index.html` contains all imports and your `main.py` code, minified and obfuscated.
 
-Build your game. The generated `index.html` file in `bin` contains the contents of `my_random.py` before the contents of `main.py`.
+## Static Classes
+
+Modules aren't minified/obfuscated and are still loaded with AJAX. If this bothers you, you can convert them into classes with static methods (like C#'s static classes). A subset sample of `math` is below:
+
+
+```
+# math.py (module)
+
+def max(a, b)
+  pass # ...
+  
+def pow(a, b)
+  pass # ...
+  
+# math.py (static class)
+class Math:
+  def __init__(self):
+    raise(Exception("Static classes can't be instantiated."))
+  
+  @staticmethod
+  def max(a, b):
+    pass # ...
+    
+  @staticmethod
+  def pow(a, b):
+    pass # ...
+```
