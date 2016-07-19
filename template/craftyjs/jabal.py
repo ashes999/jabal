@@ -50,7 +50,7 @@ class Entity:
 
     # lambda: takes no parameters
     def on_click(self, click_lambda):
-        self.entity.bind("Click", lambda: click_lambda())
+        self.entity.requires('Mouse').bind("Click", lambda: click_lambda())
         return self
         
     def move(self, x, y):
@@ -58,7 +58,7 @@ class Entity:
         return self
         
     def move_with_keyboard(self, velocity = 20):
-        self.entity.fourway(velocity)
+        self.entity.requires('Fourway').fourway(velocity)
         return self
         
     def size(self, width, height):

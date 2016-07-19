@@ -19,7 +19,7 @@ class AppBuilder:
 
         watch_path = self.validate_args(sys.argv)
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
-        output_directory = "{0}{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
+        output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         
         io.directory.recreate_directory(output_directory)
         
