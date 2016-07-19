@@ -23,11 +23,13 @@ This creates an `800x600` greyish background with a red square. The red square r
 
 Compile (to Javascript) and run by running `python /path/to/jabal/watch.py`. The resulting Javascript (including assets, etc.) appears in `bin`.
 
+Run `python -m SimpleHTTPServer` from bin, then open your browser to `localhost:8000`. You should see your game.
+
 # Create Classes, Not Modules
 
 Jabal embeds your Python code into a single (minified and obfuscated) script. When you use classes, Jabal embeds and inlines them, along with your `main.py` code, into a single, continuous script. They work.
 
-Modules depend fundamentally on being in separate files. They don't work in an embedded environment. 
+Modules aren't embedded, because they have to exist in a file. They're copied to the root directory of your game (where `main.py` lives) and served up as static files by your HTTP server. They're not obfuscated or minified automatically. (If you're not planning to use modules, you don't need an HTTP server to access the generated `index.html` file; you can view it directly in your browser.) 
 
 Sample:
 
