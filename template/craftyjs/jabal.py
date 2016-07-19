@@ -38,10 +38,14 @@ class Jabal:
 
 class Entity:    
     def __init__(self):
-        self.entity = craftyjs.e('2D, DOM, Color, Fourway, Mouse')
+        self.entity = craftyjs.e('2D, Alpha, Delay, Color, Collision, WebGL, Canvas')
 
     def colour(self, code):
         self.entity.color(code)
+        return self
+
+    def image(self, filename):
+        self.entity.requires('Image').image(filename)
         return self
 
     # lambda: takes no parameters

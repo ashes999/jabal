@@ -17,7 +17,7 @@ class AppBuilder:
         
     def watch(self):
 
-        watch_path = self.validate_args()
+        watch_path = self.validate_args(sys.argv)
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
         output_directory = "{0}{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         
@@ -55,14 +55,14 @@ class AppBuilder:
                         
             time.sleep(0.5)
                 
-    def validate_args(self):
-        if len(sys.argv) != 2:
+    def validate_args(self, args):
+        if len(args) != 2:
             print("Usage: python watch.py /path/to/yourgame")
             sys.exit(1)
         else:
-            watch_path = sys.argv[1]
+            watch_path = args[1]
             
-        main_file = "{0}/{1}".format(sys.argv[1], AppBuilder.DEFAULT_MAIN_FILE)
+        main_file = "{0}/{1}".format(args[1], AppBuilder.DEFAULT_MAIN_FILE)
         if not os.path.exists(main_file):
             raise(Exception("Can't find {0}".format(main_file)))
             
