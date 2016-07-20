@@ -10,6 +10,7 @@ class AppBuilder:
     MAIN_HTML_FILE = 'index.html' # name of the generated (and template) HTML file
     JABAL_BACKEND = 'craftyjs' # back-end to use in generation
     JABAL_MAIN_PY = 'jabal.py' # file containing jabal's python module, to include first
+    JABAL_MAIN_CODE = 'import main' # contents if not embedding everything
     
     # not guaranteed to be a package name and doesn't include multiple imports on one line
     IMPORT_REGEX = '(from ([a-z\._]+) import [a-z]+)'
@@ -54,7 +55,7 @@ class AppBuilder:
                 
                 with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
                     #substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
-                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, 'import main')
+                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, AppBuilder.JABAL_MAIN_CODE)
                     out_file.write(substituted)
 
             time.sleep(0.5)
@@ -90,7 +91,7 @@ class AppBuilder:
                 continue
             
             if not os.path.exists(path_name):
-                print "WARNING: imported {0} but {1} doesn't exist".format(module_name, path_name)
+                print("WARNING: imported {0} but {1} doesn't exist".format(module_name, path_name))
             
             with open(path_name) as imported_file:
                 imported_code = imported_file.read()
