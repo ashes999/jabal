@@ -44,7 +44,7 @@ class AppBuilder:
                     jabal_code = jabal_module.read()
                     main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
                     
-                main_code = self.inline_imports(watch_path, main_code)                
+                #main_code = self.inline_imports(watch_path, main_code)                
                     
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()

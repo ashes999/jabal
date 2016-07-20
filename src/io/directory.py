@@ -16,6 +16,10 @@ def copy_directory_tree(directory, destination, directory_to_skip = None, exclud
             else:
                 shutil.copy(os.path.realpath(entry_src), destination)
             
-def recreate_directory(dir):
-    shutil.rmtree(dir, True)
-    os.makedirs(dir)
+def recreate_directory(directory):
+    for entry in os.listdir(directory):
+        entry_src = os.path.join(directory, entry)
+        if os.path.isdir(entry_src):
+            shutil.rmtree(entry_src)
+        else:
+            os.remove(entry_src)    
