@@ -37,6 +37,13 @@ Jabal can optionally combine, obfuscate, and embed your Python code inside the H
 
 To use this mode, pass the `--embed-imports` command-line argument to Jabal. The generated `index.html` contains all imports and your `main.py` code, minified and obfuscated.
 
+## Importing Modules
+
+Importing modules currently works like this:
+
+- If the module file is `foo.py`, write `import foo`
+- If the module file is `foo/bar.py`, write `from foo import bar`. Note that you'll see a Javascript console error complaining that `foo.py` doesn't exist, even though the import succeeds (see [this issue](https://github.com/brython-dev/brython/issues/458) for some more information).
+
 ## Static Classes
 
 Modules aren't minified/obfuscated and are still loaded with AJAX. If this bothers you, you can convert them into classes with static methods (like C#'s static classes). A subset sample of `math` is below:
