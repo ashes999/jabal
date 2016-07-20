@@ -1,4 +1,4 @@
-import datetime, os.path, re, sys, time
+import datetime, os.path, re, shutil, sys, time
 import io.directory
 
 class AppBuilder:
@@ -26,7 +26,7 @@ class AppBuilder:
         # Copy backend template. Index.html gets overridden, so it's not excluded.
         relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
         io.directory.copy_directory_tree(relative_template_directory, output_directory, AppBuilder.OUTPUT_DIRECTORY)
-        io.directory.copy_directory_tree(watch_path, output_directory, AppBuilder.OUTPUT_DIRECTORY, lambda f: f.upper().endswith('.PY'))
+        io.directory.copy_directory_tree(watch_path, output_directory, AppBuilder.OUTPUT_DIRECTORY)
         
         last_updated = None
         
@@ -35,22 +35,26 @@ class AppBuilder:
             if now != last_updated:
                 print("{0} changed at {1}. Rebuilding.".format(main_file, datetime.datetime.now()))
                 last_updated = now
+                shutil.copy(main_file, output_directory)
                 
-                with open(main_file) as source_file:
-                    main_code = source_file.read()
-                    
-                jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
-                with open(jabal_module_file) as jabal_module:
-                    jabal_code = jabal_module.read()
-                    main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
-                    
+                #with open(main_file) as source_file:
+                #    main_code = source_file.read()
+                #    
+                #jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
+                #with open(jabal_module_file) as jabal_module:
+                #    jabal_code = jabal_module.read()
+                #    main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
+                #    
                 #main_code = self.inline_imports(watch_path, main_code)                
-                    
+                #    
+                
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
                     
+                
                 with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
-                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
+                    #substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
+                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, 'import main')
                     out_file.write(substituted)
 
             time.sleep(0.5)
