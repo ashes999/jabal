@@ -1,6 +1,6 @@
 import pytest
 import src.io.directory
-from src.watch import AppBuilder
+from src.app_builder import AppBuilder
 
 class TestWatch:
     def test_validate_args_throws_if_path_doesnt_exist(self):
