@@ -15,10 +15,15 @@ class AppBuilder:
     # not guaranteed to be a package name and doesn't include multiple imports on one line
     IMPORT_REGEX = '(from ([a-z\._]+) import [a-z]+)'
     IGNORE_IMPORTS = ['browser', 'console', 'document', 'window'] # Brython/JS interop
+    
+    VALID_COMMAND_LINE_ARGUMENTS = { "embed code": '--embed-code' }
         
     def watch(self):
 
-        watch_path = self.validate_args(sys.argv[1:])
+        data = self.validate_args(sys.argv[1:])
+        watch_path = data["watch path"]
+        cmdline_arguments = data["command-line arguments"]
+        
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
         output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         
@@ -61,16 +66,21 @@ class AppBuilder:
             time.sleep(0.5)
                 
     def validate_args(self, args):
-        if len(args) != 1:
+        if len(args) == 0:
             raise(Exception("Usage: python watch.py /path/to/yourgame"))
         else:
             watch_path = args[0]
-            
+                    
+        cmdline_args = args[1:]
+        for argument in cmdline_args:
+            if not argument in AppBuilder.VALID_COMMAND_LINE_ARGUMENTS.values():
+                raise(Exception("Invalid command-line argument: {0}".format(argument)))
+        
         main_file = "{0}/{1}".format(args[0], AppBuilder.DEFAULT_MAIN_FILE)
         if not os.path.exists(main_file):
             raise(Exception("Can't find {0}".format(main_file)))
             
-        return watch_path
+        return { "watch path": watch_path, "command-line arguments": [cmdline_args] }
                 
     def inline_imports(self, watch_path, python_code):
         # Replace "from a.b import C" with the contents of a/b.py
