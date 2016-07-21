@@ -43,24 +43,24 @@ class AppBuilder:
                 last_updated = now
                 shutil.copy(main_file, output_directory)
                 
-                #with open(main_file) as source_file:
-                #    main_code = source_file.read()
-                #    
-                #jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
-                #with open(jabal_module_file) as jabal_module:
-                #    jabal_code = jabal_module.read()
-                #    main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
-                #    
-                #main_code = self.inline_imports(watch_path, main_code)                
-                #    
-                
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
                     
+                if AppBuilder.VALID_COMMAND_LINE_ARGUMENTS["embed code"] in cmdline_arguments:
+                    with open(main_file) as source_file:
+                       main_code = source_file.read()
+                       
+                    jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
+                    with open(jabal_module_file) as jabal_module:
+                       jabal_code = jabal_module.read()
+                       main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
+                       
+                    main_code = self.inline_imports(watch_path, main_code)         
+                else:
+                    main_code = original.replace(AppBuilder.CONTENT_PLACEHOLDER, AppBuilder.JABAL_MAIN_CODE)
                 
                 with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
-                    #substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
-                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, AppBuilder.JABAL_MAIN_CODE)
+                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
                     out_file.write(substituted)
 
             time.sleep(0.5)
@@ -80,7 +80,7 @@ class AppBuilder:
         if not os.path.exists(main_file):
             raise(Exception("Can't find {0}".format(main_file)))
             
-        return { "watch path": watch_path, "command-line arguments": [cmdline_args] }
+        return { "watch path": watch_path, "command-line arguments": cmdline_args }
                 
     def inline_imports(self, watch_path, python_code):
         # Replace "from a.b import C" with the contents of a/b.py
@@ -97,15 +97,15 @@ class AppBuilder:
             path_name = "{0}/{1}".format(watch_path, module_name.replace('.', '/'))
             path_name += ".py" 
             
-            if AppBuilder.IGNORE_IMPORTS.__contains__(module_name):
+            if module_name in AppBuilder.IGNORE_IMPORTS:
                 continue
             
             if not os.path.exists(path_name):
                 print("WARNING: imported {0} but {1} doesn't exist".format(module_name, path_name))
+            else:
+                with open(path_name) as imported_file:
+                    imported_code = imported_file.read()
             
-            with open(path_name) as imported_file:
-                imported_code = imported_file.read()
-            
-            python_code = python_code.replace(import_statement, imported_code)
+                python_code = python_code.replace(import_statement, imported_code)
             
         return python_code
