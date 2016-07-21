@@ -72,9 +72,19 @@ class Math:
     pass # ...
 ```
 
+# Using your Favourite Javascript Libraries with Jabal
+
+Since Jabal uses Brython and wraps Javascript, you can add your favourite Javascript libraries to Jabal. Simply:
+
+- Clone Jabal from git
+- Download the library (regular or minified) and drop it into Jabal's `template/craftyjs/lib` directory
+- Add a reference to it (and/or any CSS files, fonts, etc.) in `template/craftyjs/index.html`
+
+If you're actually doing this, please open an issue on GitHub so we can provide a method of doing this that doesn't rely on cloning Jabal from source. 
+
 # Acknowledgements
 
 We are extremely thankful to and grateful for authors of various open-source projects that power Jabal. An incomplete list includes:
 
-- Brython
-- CraftyJS 
+- [Brython](https://github.com/brython-dev/brython)
+- [CraftyJS](https://github.com/craftyjs/Crafty/) 

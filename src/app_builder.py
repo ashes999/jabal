@@ -28,7 +28,7 @@ class AppBuilder:
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
         output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         
-        io.directory.ensure_exists(output_directory)
+        io.directory.recreate_directory(output_directory)
         
         # Copy backend template. Index.html gets overridden, so it's not excluded.
         relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
@@ -108,7 +108,7 @@ class AppBuilder:
                         
                     main_code = self.inline_imports(watch_path, main_code)
                 else:
-                    main_code = original.replace(AppBuilder.CONTENT_PLACEHOLDER, AppBuilder.JABAL_MAIN_CODE)
+                    main_code = AppBuilder.JABAL_MAIN_CODE
                     
                 out_file_name = "{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE)
                 with open(out_file_name, 'w+') as out_file:
