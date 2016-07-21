@@ -27,20 +27,36 @@ class AppBuilder:
         main_file = "{0}/{1}".format(watch_path, AppBuilder.DEFAULT_MAIN_FILE)
         output_directory = "{0}/{1}".format(watch_path, AppBuilder.OUTPUT_DIRECTORY)
         
-        io.directory.recreate_directory(output_directory)
+        io.directory.ensure_exists(output_directory)
         
         # Copy backend template. Index.html gets overridden, so it's not excluded.
         relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
         io.directory.copy_directory_tree(relative_template_directory, output_directory, AppBuilder.OUTPUT_DIRECTORY)
-        io.directory.copy_directory_tree(watch_path, output_directory, AppBuilder.OUTPUT_DIRECTORY)
         
-        last_updated = None
+        source_relative_directory = "{0}/".format(os.path.realpath(watch_path))
+        output_relative_directory = "{0}/".format(os.path.realpath(output_directory))
         
         while True:
-            now = os.path.getmtime(main_file)
-            if now != last_updated:
+            # hash of filename => File instance
+            source_files = io.directory.traverse_for_mtime(watch_path, {}, 'bin', source_relative_directory)
+            destination_files = io.directory.traverse_for_mtime(output_directory, {}, None, output_relative_directory)
+            added_files = [f for f in source_files if not f in destination_files]
+            
+            print("COMPARING: {0} vs. {1}".format(source_files.keys(), destination_files.keys()))
+            
+            print("="*80)
+            print("Source ({0}): {1}".format(len(source_files), source_files))
+            print("="*80)
+            print("Dest ({0}): {1}".format(len(destination_files), destination_files))            
+            print("="*80)
+            print("Changed ({0}): {1}".format(len(added_files), added_files))            
+            print("="*80)            
+            
+
+            if len(added_files) > 0:
+                print "ADDED: {0}".format(added_files)
+                
                 print("{0} changed at {1}. Rebuilding.".format(main_file, datetime.datetime.now()))
-                last_updated = now
                 shutil.copy(main_file, output_directory)
                 
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
@@ -63,6 +79,9 @@ class AppBuilder:
                     substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
                     out_file.write(substituted)
 
+            print "src={0} dest={1}".format(len(source_files), len(destination_files))
+
+            sys.exit(0)
             time.sleep(0.5)
                 
     def validate_args(self, args):

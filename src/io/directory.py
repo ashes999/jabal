@@ -1,4 +1,5 @@
 import os, shutil
+from file import File
 
 # Copies all the files and folders in "directory" to "destination"
 # ignore_if_lambda(file_name) returns True if the file should be ignored
@@ -16,7 +17,8 @@ def copy_directory_tree(directory, destination, directory_to_skip = None, exclud
             else:
                 shutil.copy(os.path.realpath(entry_src), destination)
 
-def traverse_for_mtime(directory, seen_already, directory_to_skip = None):
+# Returns a hash of filename => file(filename, relative path, mtime)
+def traverse_for_mtime(directory, seen_already, directory_to_skip = None, relative_directory = None):
     directory = os.path.realpath(directory)
     
     for entry in os.listdir(directory):
@@ -28,11 +30,16 @@ def traverse_for_mtime(directory, seen_already, directory_to_skip = None):
         if os.path.isdir(entry_src):
             if not directory_to_skip == None and (entry == directory_to_skip or entry.endswith("/{0}".format(directory_to_skip))):
                 continue
-            print "RECURSE {0}".format(entry_src)
-            seen_already = traverse_for_mtime(entry_src, seen_already, directory_to_skip)
+            seen_already = traverse_for_mtime(entry_src, seen_already, directory_to_skip, relative_directory)
         else:
-            print("indexing {0}".format(entry_src))
-            seen_already[entry_src] = os.path.getmtime(entry_src)
+            f = File(entry, entry_src, os.path.getmtime(entry_src))
+            if relative_directory == None:
+                seen_already[entry] = f
+                raise(Exception("!"))
+            else:
+                relative_path = f.relative_path(relative_directory)
+                print "{0} for {1}".format(relative_path, relative_directory)
+                seen_already[relative_path] = f
             
     return seen_already
 
