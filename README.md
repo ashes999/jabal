@@ -71,3 +71,10 @@ class Math:
   def pow(a, b):
     pass # ...
 ```
+
+# Acknowledgements
+
+We are extremely thankful to and grateful for authors of various open-source projects that power Jabal. An incomplete list includes:
+
+- Brython
+- CraftyJS 
