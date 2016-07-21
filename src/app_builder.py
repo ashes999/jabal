@@ -13,7 +13,8 @@ class AppBuilder:
     JABAL_MAIN_CODE = 'import main' # contents if not embedding everything
     
     # not guaranteed to be a package name and doesn't include multiple imports on one line
-    IMPORT_REGEX = '(from ([a-z\._]+) import [a-z]+)'
+    IMPORT_REGEX = r'(from ([a-z\._]+) import [a-z]+)'
+    CLASS_REGEX = r'^class'
     IGNORE_IMPORTS = ['browser', 'console', 'document', 'window'] # Brython/JS interop
     
     VALID_COMMAND_LINE_ARGUMENTS = { "embed code": '--embed-code' }
@@ -36,49 +37,70 @@ class AppBuilder:
         source_relative_directory = "{0}/".format(os.path.realpath(watch_path))
         output_relative_directory = "{0}/".format(os.path.realpath(output_directory))
         
+        class_regex = re.compile(AppBuilder.CLASS_REGEX, re.IGNORECASE)
+        
         while True:
             # hash of filename => File instance
             source_files = io.directory.traverse_for_mtime(watch_path, {}, 'bin', source_relative_directory)
             destination_files = io.directory.traverse_for_mtime(output_directory, {}, None, output_relative_directory)
             template_files = io.directory.traverse_for_mtime(relative_template_directory, {}, None, "{0}/".format(os.path.realpath(relative_template_directory)))
             
-            added_files = [f for f in source_files if not f in destination_files]
-            changed_files = [f for f in source_files if destination_files.has_key(f) and source_files[f].mtime != destination_files[f].mtime]
-            deleted_files = [f for f in destination_files if not f in source_files and not f in template_files]
+            # Collections of File instances
+            added_files = [source_files[f] for f in source_files if not f in destination_files]
+            changed_files = [source_files[f] for f in source_files if destination_files.has_key(f) and source_files[f].mtime != destination_files[f].mtime]
+            deleted_files = [destination_files[f] for f in destination_files if not f in source_files and not f in template_files]
             
-            print("deleted_files: {0}".format(deleted_files))
-            sys.exit(0)
-            
+            with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
+                original = template_file.read()
+        
+            rebuild = False
+                
             if len(added_files) > 0:
-                print "ADDED: {0}".format(added_files)
-                
-                print("{0} changed at {1}. Rebuilding.".format(main_file, datetime.datetime.now()))
-                
-                with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
-                    original = template_file.read()
+                rebuild = True
+                for file in added_files:
+                    io.directory.safe_copy(file, source_relative_directory, output_directory)
+
+            if len(changed_files) > 0:
+                rebuild = True            
+                for file in changed_files:
+                    io.directory.safe_copy(file, source_relative_directory, output_directory)
                     
-                if AppBuilder.VALID_COMMAND_LINE_ARGUMENTS["embed code"] in cmdline_arguments:
-                    with open(main_file) as source_file:
-                       main_code = source_file.read()
-                       
-                    jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
-                    with open(jabal_module_file) as jabal_module:
-                       jabal_code = jabal_module.read()
-                       main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
-                       
-                    main_code = self.inline_imports(watch_path, main_code)         
-                else:
-                    main_code = original.replace(AppBuilder.CONTENT_PLACEHOLDER, AppBuilder.JABAL_MAIN_CODE)
+            if len(deleted_files) > 0:
+                rebuild = True            
+                for file in deleted_files:
+                    os.remove(file.full_path)
+                    print("Deleted bin-only file {0}".format(file.relative_path(output_relative_directory)))                    
                 
-                with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
-                    substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
-                    out_file.write(substituted)
-
-            print "src={0} dest={1}".format(len(source_files), len(destination_files))
-
-            sys.exit(0)
+            if AppBuilder.VALID_COMMAND_LINE_ARGUMENTS["embed code"] in cmdline_arguments and rebuild == True:
+                # We may have copied over python files that are not modules. These
+                # shouldn't be copied over. Nuke them if that's the case.
+                for file in added_files.values():
+                    if file.filename.endswith('.py'):
+                        with open(file) as python_file:
+                            contents = python_file.read()
+                        if class_regex.match(contents):
+                            # It's not a module. Nuke it!
+                            os.remove(file.fullpath)
+                            print("Deleted {0} because it was copied over but isn't a module".format(file.filename))                                                      
+                
+                with open(main_file) as source_file:
+                    main_code = source_file.read()
+                    
+                jabal_module_file = "{0}/{1}".format(relative_template_directory, AppBuilder.JABAL_MAIN_PY)
+                with open(jabal_module_file) as jabal_module:
+                    jabal_code = jabal_module.read()
+                    main_code = "{0}\r\n\r\n\r\n{1}".format(jabal_code, main_code)
+                    
+                main_code = self.inline_imports(watch_path, main_code)
+            else:
+                main_code = original.replace(AppBuilder.CONTENT_PLACEHOLDER, AppBuilder.JABAL_MAIN_CODE)
+                
+            with open("{0}/{1}".format(output_directory, AppBuilder.MAIN_HTML_FILE), 'w+') as out_file:
+                substituted = original.replace(AppBuilder.CONTENT_PLACEHOLDER, main_code)
+                out_file.write(substituted)
+                    
             time.sleep(0.5)
-                
+            
     def validate_args(self, args):
         if len(args) == 0:
             raise(Exception("Usage: python watch.py /path/to/yourgame"))

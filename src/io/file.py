@@ -20,4 +20,4 @@ class File:
         return self.full_path.replace(root_dir, "")
         
     def __repr__(self):
-        return self.full_path
+        return "File: {0}".format(self.full_path)

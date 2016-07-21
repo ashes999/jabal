@@ -38,14 +38,9 @@ def traverse_for_mtime(directory, seen_already, directory_to_skip = None, relati
                 raise(Exception("!"))
             else:
                 relative_path = f.relative_path(relative_directory)
-                print "{0} for {1}".format(relative_path, relative_directory)
                 seen_already[relative_path] = f
             
     return seen_already
-
-def ensure_exists(directory):
-    if not os.path.exists(directory):
-        os.mkdir(directory)
 
 # Deletes the contents of a directory (recursively), but leaves the directory itself            
 def recreate_directory(directory):
@@ -55,3 +50,22 @@ def recreate_directory(directory):
             shutil.rmtree(entry_src)
         else:
             os.remove(entry_src)    
+
+# http://stackoverflow.com/a/18503387/210780
+def ensure_exists(path):
+    sub_path = os.path.dirname(path)
+    if not os.path.exists(sub_path):
+        ensure_exists(sub_path)
+    if not os.path.exists(path):
+        os.mkdir(path)
+        
+def safe_copy(file, relative_directory, output_directory):
+    source = file.relative_path(relative_directory)
+    # Destination, relative eg. copy /game/assets/images/player.png to /game/bin/assets.images/player.png
+    # Also handles creating said directory structure if it doesn't exist
+    destination = "{0}/{1}".format(output_directory, file.relative_path(relative_directory))
+    end_index = destination.rindex('/')
+    path  = destination[0:end_index]
+    ensure_exists(path)
+    shutil.copyfile(file.full_path, destination)
+    print("Copied file from {0} to {1}".format(source, destination))                    
