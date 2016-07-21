@@ -32,7 +32,7 @@ def traverse_for_mtime(directory, seen_already, directory_to_skip = None, relati
                 continue
             seen_already = traverse_for_mtime(entry_src, seen_already, directory_to_skip, relative_directory)
         else:
-            f = File(entry, entry_src, os.path.getmtime(entry_src))
+            f = File(entry, entry_src, os.stat(entry_src).st_mtime)
             if relative_directory == None:
                 seen_already[entry] = f
                 raise(Exception("!"))
@@ -59,7 +59,9 @@ def ensure_exists(path):
     if not os.path.exists(path):
         os.mkdir(path)
         
-def safe_copy(file, relative_directory, output_directory):
+# Copies file in relative_directory to output_directory.
+# Preserves modification time and other metadata
+def safe_copy(file, relative_directory, output_directory, message_string = ""):
     source = file.relative_path(relative_directory)
     # Destination, relative eg. copy /game/assets/images/player.png to /game/bin/assets.images/player.png
     # Also handles creating said directory structure if it doesn't exist
@@ -67,5 +69,6 @@ def safe_copy(file, relative_directory, output_directory):
     end_index = destination.rindex('/')
     path  = destination[0:end_index]
     ensure_exists(path)
-    shutil.copyfile(file.full_path, destination)
-    print("Copied file from {0} to {1}".format(source, destination))                    
+    # copy2: preserve modification time
+    shutil.copy2(file.full_path, destination)
+    print("Copied {2} file from {0} to {1}".format(source, destination, message_string))                    

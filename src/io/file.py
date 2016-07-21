@@ -1,8 +1,15 @@
+import datetime
+
 class File:
     def __init__(self, filename, full_path, mtime):
         self.filename = filename;
         self.full_path = full_path
-        self.mtime = mtime
+        # To prevent incorrectly re-copying when times vary by fractional seconds,
+        # since rounding time is not easy, just use a conveniently-precise string
+        # representation of the date/time. We use yyyy-MM-dd hh:MM:ss.tttt
+        # %f gives us tttttt (which is too precise), so we truncate two digits.
+        self.mtime = datetime.datetime.fromtimestamp(mtime)
+        self.mtime = self.mtime.strftime('%Y-%m-%d %H:%M:%S.%f')[:-2]
         
     @property
     def filename(self):

@@ -39,8 +39,10 @@ class AppBuilder:
         
         class_regex = re.compile(AppBuilder.CLASS_REGEX, re.IGNORECASE)
         
+        print("Monitoring {0} to build to {1}".format(os.path.realpath(watch_path), output_directory))
+        
         while True:
-            # hash of filename => File instance
+            # hash of relative filename => File instance
             source_files = io.directory.traverse_for_mtime(watch_path, {}, 'bin', source_relative_directory)
             destination_files = io.directory.traverse_for_mtime(output_directory, {}, None, output_relative_directory)
             template_files = io.directory.traverse_for_mtime(relative_template_directory, {}, None, "{0}/".format(os.path.realpath(relative_template_directory)))
@@ -58,12 +60,12 @@ class AppBuilder:
             if len(added_files) > 0:
                 rebuild = True
                 for file in added_files:
-                    io.directory.safe_copy(file, source_relative_directory, output_directory)
+                    io.directory.safe_copy(file, source_relative_directory, output_directory, "new")
 
             if len(changed_files) > 0:
                 rebuild = True            
                 for file in changed_files:
-                    io.directory.safe_copy(file, source_relative_directory, output_directory)
+                    io.directory.safe_copy(file, source_relative_directory, output_directory, "changed")
                     
             if len(deleted_files) > 0:
                 rebuild = True            
