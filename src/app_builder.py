@@ -41,23 +41,15 @@ class AppBuilder:
             source_files = io.directory.traverse_for_mtime(watch_path, {}, 'bin', source_relative_directory)
             destination_files = io.directory.traverse_for_mtime(output_directory, {}, None, output_relative_directory)
             added_files = [f for f in source_files if not f in destination_files]
+            changed_files = [f for f in source_files if destination_files.has_key(f) and source_files[f].mtime != destination_files[f].mtime]
             
-            print("COMPARING: {0} vs. {1}".format(source_files.keys(), destination_files.keys()))
+            print("CHANGED: {0}".format(changed_files))
+            sys.exit(0)
             
-            print("="*80)
-            print("Source ({0}): {1}".format(len(source_files), source_files))
-            print("="*80)
-            print("Dest ({0}): {1}".format(len(destination_files), destination_files))            
-            print("="*80)
-            print("Changed ({0}): {1}".format(len(added_files), added_files))            
-            print("="*80)            
-            
-
             if len(added_files) > 0:
                 print "ADDED: {0}".format(added_files)
                 
                 print("{0} changed at {1}. Rebuilding.".format(main_file, datetime.datetime.now()))
-                shutil.copy(main_file, output_directory)
                 
                 with open("{0}/{1}/{2}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND, AppBuilder.MAIN_HTML_FILE)) as template_file:
                     original = template_file.read()
