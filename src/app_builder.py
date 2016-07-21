@@ -40,10 +40,13 @@ class AppBuilder:
             # hash of filename => File instance
             source_files = io.directory.traverse_for_mtime(watch_path, {}, 'bin', source_relative_directory)
             destination_files = io.directory.traverse_for_mtime(output_directory, {}, None, output_relative_directory)
+            template_files = io.directory.traverse_for_mtime(relative_template_directory, {}, None, "{0}/".format(os.path.realpath(relative_template_directory)))
+            
             added_files = [f for f in source_files if not f in destination_files]
             changed_files = [f for f in source_files if destination_files.has_key(f) and source_files[f].mtime != destination_files[f].mtime]
+            deleted_files = [f for f in destination_files if not f in source_files and not f in template_files]
             
-            print("CHANGED: {0}".format(changed_files))
+            print("deleted_files: {0}".format(deleted_files))
             sys.exit(0)
             
             if len(added_files) > 0:
