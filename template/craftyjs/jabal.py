@@ -30,7 +30,7 @@ def play_audio(id):
 
 class Entity:    
     def __init__(self):
-        self.entity = craftyjs.e('2D, Alpha, Delay, Color, Collision, WebGL, Canvas')
+        self.entity = craftyjs.e('2D, Alpha, Delay, Color, Collision, Canvas')
 
     def colour(self, code):
         self.entity.color(code)
@@ -49,7 +49,7 @@ class Entity:
         self.entity.attr({ "x": x, "y": y })
         return self
         
-    def move_with_keyboard(self, velocity = 20):
+    def move_with_keyboard(self, velocity = 100):
         self.entity.requires('Fourway').fourway(velocity)
         return self
         

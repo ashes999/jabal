@@ -26,6 +26,23 @@ Compile (to Javascript) and run by running `python /path/to/jabal/watch.py`. The
 
 Run `python -m SimpleHTTPServer` from bin, then open your browser to `localhost:8000`. You should see your game.
 
+# Building Entities
+
+The example above uses a lambda to handle an on-click event:
+
+```python
+e.on_click(lambda: jabal.play_audio("blip"))
+```
+
+Alternatively, you can use a regular function (just make sure to define it before you assign it):
+
+```python
+def play_blip():
+    jabal.play_audio("blip")
+
+e.on_click(play_blip)
+```
+
 # Modules, Classes, and Embedding
 
 By default, Jabal uses AJAX requests to fetch files when you `import` them (eg. `import awesome_random` will make a call to `http://localhost/awesome._random.py`). This is why you need a local web server.

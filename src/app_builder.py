@@ -33,7 +33,7 @@ class AppBuilder:
         # Copy backend template. Index.html gets overridden, so it's not excluded.
         relative_template_directory = "{0}/{1}".format(AppBuilder.TEMPLATE_DIRECTORY, AppBuilder.JABAL_BACKEND)
         io.directory.copy_directory_tree(relative_template_directory, output_directory, AppBuilder.OUTPUT_DIRECTORY)
-        
+
         source_relative_directory = "{0}/".format(os.path.realpath(watch_path))
         output_relative_directory = "{0}/".format(os.path.realpath(output_directory))
         
