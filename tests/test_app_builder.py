@@ -2,7 +2,7 @@ import pytest
 import src.io.directory
 from src.app_builder import AppBuilder
 
-class TestWatch:
+class TestAppBuilder:
     def test_validate_args_throws_if_path_doesnt_exist(self):
         args = ['path/to/nothing']
         with pytest.raises(Exception):
