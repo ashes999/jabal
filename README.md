@@ -106,3 +106,4 @@ We are extremely thankful to and grateful for authors of various open-source pro
 
 - [Brython](https://github.com/brython-dev/brython)
 - [CraftyJS](https://github.com/craftyjs/Crafty/) 
+- [MelonJS](https://github.com/melonjs/melonJS)
