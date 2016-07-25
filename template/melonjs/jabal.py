@@ -28,6 +28,7 @@ class Game:
         self.width = width
         self.height = height
         self.resources = resources
+        window.copyBrythonMethodsToObjectRoot(starting_screen)
         self.starting_screen = starting_screen
 
     def onload(self):
