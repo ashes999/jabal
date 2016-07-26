@@ -49,7 +49,7 @@ class Entity:
         self.entity.attr({ "x": x, "y": y })
         return self
         
-    def move_with_keyboard(self, velocity = 100):
+    def move_with_keyboard(self, velocity = 200):
         self.entity.requires('Fourway').fourway(velocity)
         return self
         
