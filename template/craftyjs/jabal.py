@@ -45,7 +45,7 @@ class Entity:
         # Click doesn't work on some mobiles with PhoneGap, for some reason.
         # See: https://github.com/craftyjs/Crafty/issues/1043
         # Mouse-up seems to work, so bind to that.
-        self.entity.requires('Mouse').bind("Click", lambda: click_lambda()).bind("MouseUp", lambda: click_lambda())
+        self.entity.requires('Mouse').bind("MouseUp", lambda: click_lambda())
         return self
 
     def move(self, x, y):
